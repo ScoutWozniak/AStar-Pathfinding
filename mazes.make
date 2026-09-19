@@ -110,11 +110,6 @@ endif
 # File sets
 # #############################################
 
-GENERATED :=
-OBJECTS :=
-
-GENERATED += $(OBJDIR)/testing.o
-OBJECTS += $(OBJDIR)/testing.o
 
 # Rules
 # #############################################
@@ -122,7 +117,7 @@ OBJECTS += $(OBJDIR)/testing.o
 all: $(TARGET)
 	@:
 
-$(TARGET): $(GENERATED) $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
+$(TARGET): $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
 	$(PRELINKCMDS)
 	@echo Linking mazes
 	$(SILENT) $(LINKCMD)
@@ -177,10 +172,6 @@ endif
 
 # File Rules
 # #############################################
-
-$(OBJDIR)/testing.o: projects/maze_src/testing.cpp
-	@echo "$(notdir $<)"
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
 ifneq (,$(PCH))
