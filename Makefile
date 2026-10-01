@@ -10,54 +10,54 @@ endif
 
 ifeq ($(config),debug_x64)
   maze_otaur_config = debug_x64
-  mazes_config = debug_x64
+  Pathfinding_config = debug_x64
   raylib_config = debug_x64
 
 else ifeq ($(config),debug_x86)
   maze_otaur_config = debug_x86
-  mazes_config = debug_x86
+  Pathfinding_config = debug_x86
   raylib_config = debug_x86
 
 else ifeq ($(config),debug_arm64)
   maze_otaur_config = debug_arm64
-  mazes_config = debug_arm64
+  Pathfinding_config = debug_arm64
   raylib_config = debug_arm64
 
 else ifeq ($(config),release_x64)
   maze_otaur_config = release_x64
-  mazes_config = release_x64
+  Pathfinding_config = release_x64
   raylib_config = release_x64
 
 else ifeq ($(config),release_x86)
   maze_otaur_config = release_x86
-  mazes_config = release_x86
+  Pathfinding_config = release_x86
   raylib_config = release_x86
 
 else ifeq ($(config),release_arm64)
   maze_otaur_config = release_arm64
-  mazes_config = release_arm64
+  Pathfinding_config = release_arm64
   raylib_config = release_arm64
 
 else
   $(error "invalid configuration $(config)")
 endif
 
-PROJECTS := maze_otaur mazes raylib
+PROJECTS := maze_otaur Pathfinding raylib
 
 .PHONY: all clean help $(PROJECTS) 
 
 all: $(PROJECTS)
 
-maze_otaur: raylib mazes
+maze_otaur: raylib Pathfinding
 ifneq (,$(maze_otaur_config))
 	@echo "==== Building maze_otaur ($(maze_otaur_config)) ===="
 	@${MAKE} --no-print-directory -C . -f maze_otaur.make config=$(maze_otaur_config)
 endif
 
-mazes:
-ifneq (,$(mazes_config))
-	@echo "==== Building mazes ($(mazes_config)) ===="
-	@${MAKE} --no-print-directory -C . -f mazes.make config=$(mazes_config)
+Pathfinding:
+ifneq (,$(Pathfinding_config))
+	@echo "==== Building Pathfinding ($(Pathfinding_config)) ===="
+	@${MAKE} --no-print-directory -C . -f Pathfinding.make config=$(Pathfinding_config)
 endif
 
 raylib:
@@ -68,7 +68,7 @@ endif
 
 clean:
 	@${MAKE} --no-print-directory -C . -f maze_otaur.make clean
-	@${MAKE} --no-print-directory -C . -f mazes.make clean
+	@${MAKE} --no-print-directory -C . -f Pathfinding.make clean
 	@${MAKE} --no-print-directory -C . -f raylib.make clean
 
 help:
@@ -86,7 +86,7 @@ help:
 	@echo "   all (default)"
 	@echo "   clean"
 	@echo "   maze_otaur"
-	@echo "   mazes"
+	@echo "   Pathfinding"
 	@echo "   raylib"
 	@echo ""
 	@echo "For more information, see https://github.com/premake/premake-core/wiki"

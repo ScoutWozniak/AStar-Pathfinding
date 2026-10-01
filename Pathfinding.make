@@ -28,11 +28,12 @@ ifeq ($(origin AR), default)
   AR = ar
 endif
 RESCOMP = windres
-INCLUDES += -Iprojects/game_src -Iinclude -Ibuild/external/raylib-master/src -Iprojects/pathfinding_src
+INCLUDES += -Iprojects/pathfinding_src -Iinclude -Ibuild/external/raylib-master/src
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
+LIBS += -lwinmm -lgdi32 -lopengl32
+LDDEPS +=
 define PREBUILDCMDS
 endef
 define PRELINKCMDS
@@ -42,69 +43,63 @@ endef
 
 ifeq ($(config),debug_x64)
 TARGETDIR = bin/Debug
-TARGET = $(TARGETDIR)/maze_otaur.exe
-OBJDIR = obj/x64/Debug/maze_otaur
+TARGET = $(TARGETDIR)/Pathfinding.lib
+OBJDIR = obj/x64/Debug/Pathfinding
 DEFINES += -DDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_WIN32
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -g -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -g -std=c++20
-LIBS += bin/Debug/raylib.lib bin/Debug/Pathfinding.lib -lwinmm -lgdi32 -lopengl32
-LDDEPS += bin/Debug/raylib.lib bin/Debug/Pathfinding.lib
 ALL_LDFLAGS += $(LDFLAGS) -Lbin/Debug -L/usr/lib64 -m64
+LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
 
 else ifeq ($(config),debug_x86)
 TARGETDIR = bin/Debug
-TARGET = $(TARGETDIR)/maze_otaur.exe
-OBJDIR = obj/x86/Debug/maze_otaur
+TARGET = $(TARGETDIR)/Pathfinding.lib
+OBJDIR = obj/x86/Debug/Pathfinding
 DEFINES += -DDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_WIN32
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -g -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -g -std=c++20
-LIBS += bin/Debug/raylib.lib bin/Debug/Pathfinding.lib -lwinmm -lgdi32 -lopengl32
-LDDEPS += bin/Debug/raylib.lib bin/Debug/Pathfinding.lib
 ALL_LDFLAGS += $(LDFLAGS) -Lbin/Debug -L/usr/lib32 -m32
+LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
 
 else ifeq ($(config),debug_arm64)
 TARGETDIR = bin/Debug
-TARGET = $(TARGETDIR)/maze_otaur.exe
-OBJDIR = obj/ARM64/Debug/maze_otaur
+TARGET = $(TARGETDIR)/Pathfinding.lib
+OBJDIR = obj/ARM64/Debug/Pathfinding
 DEFINES += -DDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_WIN32
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Wshadow -g -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Wshadow -g -std=c++20
-LIBS += bin/Debug/raylib.lib bin/Debug/Pathfinding.lib -lwinmm -lgdi32 -lopengl32
-LDDEPS += bin/Debug/raylib.lib bin/Debug/Pathfinding.lib
 ALL_LDFLAGS += $(LDFLAGS) -Lbin/Debug
+LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
 
 else ifeq ($(config),release_x64)
 TARGETDIR = bin/Release
-TARGET = $(TARGETDIR)/maze_otaur.exe
-OBJDIR = obj/x64/Release/maze_otaur
+TARGET = $(TARGETDIR)/Pathfinding.exe
+OBJDIR = obj/x64/Release/Pathfinding
 DEFINES += -DNDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_WIN32
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -O2 -std=c17 -Wl,--subsystem,windows
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -O2 -std=c++20 -Wl,--subsystem,windows
-LIBS += bin/Release/raylib.lib -lwinmm -lgdi32 -lopengl32
-LDDEPS += bin/Release/raylib.lib
 ALL_LDFLAGS += $(LDFLAGS) -Lbin/Release -L/usr/lib64 -m64 -mwindows -s
+LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 
 else ifeq ($(config),release_x86)
 TARGETDIR = bin/Release
-TARGET = $(TARGETDIR)/maze_otaur.exe
-OBJDIR = obj/x86/Release/maze_otaur
+TARGET = $(TARGETDIR)/Pathfinding.exe
+OBJDIR = obj/x86/Release/Pathfinding
 DEFINES += -DNDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_WIN32
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -O2 -std=c17 -Wl,--subsystem,windows
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -O2 -std=c++20 -Wl,--subsystem,windows
-LIBS += bin/Release/raylib.lib -lwinmm -lgdi32 -lopengl32
-LDDEPS += bin/Release/raylib.lib
 ALL_LDFLAGS += $(LDFLAGS) -Lbin/Release -L/usr/lib32 -m32 -mwindows -s
+LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 
 else ifeq ($(config),release_arm64)
 TARGETDIR = bin/Release
-TARGET = $(TARGETDIR)/maze_otaur.exe
-OBJDIR = obj/ARM64/Release/maze_otaur
+TARGET = $(TARGETDIR)/Pathfinding.exe
+OBJDIR = obj/ARM64/Release/Pathfinding
 DEFINES += -DNDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_WIN32
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Wshadow -O2 -std=c17 -Wl,--subsystem,windows
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Wshadow -O2 -std=c++20 -Wl,--subsystem,windows
-LIBS += bin/Release/raylib.lib -lwinmm -lgdi32 -lopengl32
-LDDEPS += bin/Release/raylib.lib
 ALL_LDFLAGS += $(LDFLAGS) -Lbin/Release -mwindows -s
+LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 
 endif
 
@@ -115,11 +110,6 @@ endif
 # File sets
 # #############################################
 
-GENERATED :=
-OBJECTS :=
-
-GENERATED += $(OBJDIR)/main.o
-OBJECTS += $(OBJDIR)/main.o
 
 # Rules
 # #############################################
@@ -127,9 +117,9 @@ OBJECTS += $(OBJDIR)/main.o
 all: $(TARGET)
 	@:
 
-$(TARGET): $(GENERATED) $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
+$(TARGET): $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
 	$(PRELINKCMDS)
-	@echo Linking maze_otaur
+	@echo Linking Pathfinding
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -150,7 +140,7 @@ else
 endif
 
 clean:
-	@echo Cleaning maze_otaur
+	@echo Cleaning Pathfinding
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(GENERATED)
@@ -182,10 +172,6 @@ endif
 
 # File Rules
 # #############################################
-
-$(OBJDIR)/main.o: projects/game_src/main.cpp
-	@echo "$(notdir $<)"
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
 ifneq (,$(PCH))

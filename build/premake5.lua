@@ -207,12 +207,12 @@ if (downloadRaylib) then
         includedirs { "../projects/game_src" }
         includedirs { "../include" }
 
-        links {"raylib", "mazes"}
+        links {"raylib", "Pathfinding"}
 
         cdialect "C17"
         cppdialect "C++20"
 
-        includedirs {raylib_dir .. "/src", "../projects/maze_src" }
+        includedirs {raylib_dir .. "/src", "../projects/pathfinding_src" }
 
         flags { "ShadowedVariables"}
         platform_defines()
@@ -243,7 +243,7 @@ if (downloadRaylib) then
 
         filter{}
     
-    project "mazes"
+    project "Pathfinding"
         kind "StaticLib"
     
         location "../"
@@ -266,13 +266,13 @@ if (downloadRaylib) then
 
         vpaths 
         {
-            ["Header Files/*"] = { "../projects/maze_src/**.h",  "../projects/maze_src/**.hpp"},
-            ["Source Files/*"] = {"../projects/maze_src/**.c", "../projects/maze_src/**.cpp"},
+            ["Header Files/*"] = { "../projects/pathfinding_src/**.h",  "../projects/pathfinding_src/**.hpp"},
+            ["Source Files/*"] = {"../projects/pathfinding_src/**.c", "../projects/pathfinding_src/**.cpp"},
         }
         
-        files {"../projects/maze_src/**.c", "../projects/maze_src/**.cpp", "../projects/maze_src/**.h", "../projects/maze_src/**.hpp"}
+        files {"../projects/pathfinding_src/**.c", "../projects/pathfinding_src/**.cpp", "../projects/pathfinding_src/**.h", "../projects/pathfinding_src/**.hpp"}
                 
-        includedirs { "../projects/maze_src/" }
+        includedirs { "../projects/pathfinding_src/" }
         includedirs { "../include" }
         cdialect "C17"
         cppdialect "C++20"
