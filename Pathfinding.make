@@ -110,6 +110,11 @@ endif
 # File sets
 # #############################################
 
+GENERATED :=
+OBJECTS :=
+
+GENERATED += $(OBJDIR)/nodes.o
+OBJECTS += $(OBJDIR)/nodes.o
 
 # Rules
 # #############################################
@@ -117,7 +122,7 @@ endif
 all: $(TARGET)
 	@:
 
-$(TARGET): $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
+$(TARGET): $(GENERATED) $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
 	$(PRELINKCMDS)
 	@echo Linking Pathfinding
 	$(SILENT) $(LINKCMD)
@@ -172,6 +177,10 @@ endif
 
 # File Rules
 # #############################################
+
+$(OBJDIR)/nodes.o: projects/pathfinding_src/nodes.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
 -include $(OBJECTS:%.o=%.d)
 ifneq (,$(PCH))
