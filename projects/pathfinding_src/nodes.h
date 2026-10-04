@@ -17,6 +17,10 @@ namespace Pathfinding {
         }
     };
 
+    float DistanceBetweenNodes(Node* a, Node* b);
+
+    int GetIDFromPos(int x, int y);
+
     // Contains all nodes
     class World {
     public:

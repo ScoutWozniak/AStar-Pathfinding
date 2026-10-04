@@ -113,7 +113,9 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/basePathfinding.o
 GENERATED += $(OBJDIR)/nodes.o
+OBJECTS += $(OBJDIR)/basePathfinding.o
 OBJECTS += $(OBJDIR)/nodes.o
 
 # Rules
@@ -178,6 +180,9 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/basePathfinding.o: projects/pathfinding_src/basePathfinding.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/nodes.o: projects/pathfinding_src/nodes.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
