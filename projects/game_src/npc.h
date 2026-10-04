@@ -30,6 +30,9 @@ class NPC {
     private:
         const float m_Speed = 3.0f;
 
+        float m_CurrentAngle = 0.0f;
+        float m_TargetAngle = 0.0f;
+
         Pathfinding::Node* m_Goal;
 
         Pathfinding::World* m_World;

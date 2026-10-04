@@ -59,10 +59,6 @@ int main ()
 
 	curWorld.NewWorld();
 
-	Pathfinding::Node* curGoal;
-	Pathfinding::Node* curStart;
-
-
 	// Create a node for every empty square
 	// Due to memory issues we cannot set neighbors here
 	for (int x = 0; x < MAP_SIZE; x++) {
@@ -106,8 +102,11 @@ int main ()
 	}
 
 	// Setting up the temporary goal here
-	curStart = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(1,1));
-	curGoal = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(6,4));
+	Pathfinding::Node* curGoal = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(1,1));
+	Pathfinding::Node* curStart = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(6,4));
+
+
+	Pathfinding::Node* curGoal2 = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(15, 1));
 
 	Vector2 screenSize = (Vector2{(float)GetScreenWidth(), (float)GetScreenHeight()});
 
@@ -123,6 +122,9 @@ int main ()
 	NPC npc = {&curWorld, {curStart->m_PosX, curStart->m_PosY}};
 	npc.UpdateGoal(curGoal);
 
+	NPC npc2 = {&curWorld, {3, 3}};
+	npc2.UpdateGoal(curGoal2);
+
 	// game loop
 	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
 	{
@@ -134,6 +136,16 @@ int main ()
 			if (IsInBounds(gridPos) && map[gridPos[1]][gridPos[0]] != 1) {
 				curGoal = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(gridPos[0], gridPos[1]));
 				npc.UpdateGoal(curGoal);
+			}
+		}
+
+		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), cam);
+			mousePos /= MAP_SCALE;
+			int gridPos[2] = {mousePos.x, mousePos.y};
+			if (IsInBounds(gridPos) && map[gridPos[1]][gridPos[0]] != 1) {
+				curGoal2 = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(gridPos[0], gridPos[1]));
+				npc2.UpdateGoal(curGoal2);
 			}
 		}
 
@@ -153,6 +165,7 @@ int main ()
 		if (IsKeyPressed(KEY_TWO)) drawRawNodes = !drawRawNodes;
 		
 		npc.Update();
+		npc2.Update();
 		
 		// drawing
 		BeginDrawing();
@@ -178,10 +191,7 @@ int main ()
 			
 
 			if (drawRawNodes) {
-				Color nodeColor = node.m_Id == curStart->m_Id ? BLUE : RED;
-				nodeColor = node.m_Id == curGoal->m_Id ? GREEN : nodeColor;
-
-				DrawCircle(screenPos[0], screenPos[1], MAP_SCALE * 0.25f, nodeColor);
+				DrawCircle(screenPos[0], screenPos[1], MAP_SCALE * 0.25f, RED);
 				DrawText((std::to_string( node.m_Id).c_str() ), screenPos[0], screenPos[1], 8, BLACK);
 			}
 			
@@ -197,6 +207,7 @@ int main ()
 		}
 
 		npc.Draw();
+		npc2.Draw();
 
 		EndMode2D();
 

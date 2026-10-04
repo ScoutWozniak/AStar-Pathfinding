@@ -2,6 +2,7 @@
 #include "nodes.h"
 #include "math.h"
 #include <algorithm>
+#include <iostream>
 
 void Pathfinding::World::NewWorld()
 {
@@ -19,7 +20,7 @@ Pathfinding::Node* Pathfinding::World::GetNodeWithId(int id)
     return &(*it);
 }
 
-float DistBetweenPoints(int pos1[], int pos2[]) {
+float DistBetweenPoints(float pos1[], float pos2[]) {
         float ret = 0.0f;
 
         float xDist = pos1[0]- pos2[0];
@@ -32,8 +33,8 @@ float DistBetweenPoints(int pos1[], int pos2[]) {
 
 float Pathfinding::DistanceBetweenNodes(Node *a, Node *b)
 {
-    int aPos[2] = {a->m_PosX, a->m_PosY};
-    int bPos[2] = {b->m_PosX, b->m_PosY};
+    float aPos[2] = {(float)a->m_PosX, (float)a->m_PosY};
+    float bPos[2] = {(float)b->m_PosX, (float)b->m_PosY};
     return DistBetweenPoints(aPos, bPos);
 }
 
@@ -44,15 +45,16 @@ int Pathfinding::GetIDFromPos(int x, int y)
 
 
 
-Pathfinding::Node *Pathfinding::GetNodeInRadius(Pathfinding::World* world, int posX, int posY, float radius)
+Pathfinding::Node *Pathfinding::GetNodeInRadius(Pathfinding::World* world, float posX, float posY, float radius)
 {
-    int posA[2] = {posX, posY};
+    float posA[2] = {posX, posY};
     Pathfinding::Node* closestNode = nullptr;
     float closestDist = 0.0f;
 
     for (auto it = world->m_Nodes.begin(); it != world->m_Nodes.end(); ++it) {
-        int nodePos[2] = {(*it).m_PosX, (*it).m_PosY};
+        float nodePos[2] = {(*it).m_PosX, (*it).m_PosY};
         float dist = DistBetweenPoints(posA, nodePos);
+        std::cout << "Dist of point " << (*it).m_Id << " is " << dist << std::endl;
         if (dist <= radius && (dist < closestDist || closestNode == nullptr)) {
             closestNode = &(*it);
             closestDist = dist;

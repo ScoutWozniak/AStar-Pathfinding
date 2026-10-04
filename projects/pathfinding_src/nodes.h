@@ -39,8 +39,8 @@ namespace Pathfinding {
 
         Node* GetNodeWithId(int id);
     };
-    
+
     // NOTE - EXPENSIVE!
-    Node* GetNodeInRadius(World* world, int posX, int posY, float radius);
+    Node* GetNodeInRadius(World* world, float posX, float posY, float radius);
 }
 

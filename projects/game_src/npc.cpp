@@ -19,10 +19,13 @@ void NPC::Initialise()
 
 void NPC::Update()
 {
+    m_CurrentAngle = Lerp(m_CurrentAngle, m_TargetAngle, GetFrameTime() * 20.0f);
     if (m_CurrentPath.empty()) return;
 
     Vector2 nodePos =  {m_CurrentPath.front()->m_PosX, m_CurrentPath.front()->m_PosY};
     Vector2 dirToFirstPoint = Vector2Normalize(nodePos - m_Position) * m_Speed * GetFrameTime();
+    m_TargetAngle = Vector2Angle(Vector2UnitY, dirToFirstPoint);
+
     m_Position += dirToFirstPoint;
 
 
@@ -39,6 +42,8 @@ void NPC::Draw()
 {
     Vector2 worldPos = WorldPosToRenderPos(m_Position);
     DrawCircle(worldPos.x + centeringValue, worldPos.y + centeringValue, 4.0f, PURPLE);
+    
+    DrawRectanglePro({worldPos.x + centeringValue, worldPos.y + centeringValue, MAP_SIZE, MAP_SIZE}, {MAP_SIZE * 0.5f, MAP_SIZE * 0.5f}, RAD2DEG * m_CurrentAngle, WHITE);
 
 
     // Draw path!
@@ -61,7 +66,9 @@ void NPC::Draw()
 
 void NPC::RecalculatePath()
 {
-    Pathfinding::Node* closestNode = Pathfinding::GetNodeInRadius(m_World, m_Position.x, m_Position.y, 1.0f);
+    Pathfinding::Node* closestNode = Pathfinding::GetNodeInRadius(m_World, m_Position.x, m_Position.y, 0.5f);
+    if (closestNode == nullptr) return;
+    
     Pathfinding::AStar pathfinder = {};
     m_CurrentResult = pathfinder.ResolvePath(closestNode, m_Goal);
     m_CurrentPath =  Pathfinding::ReconstructPath(closestNode, m_Goal, m_CurrentResult);
