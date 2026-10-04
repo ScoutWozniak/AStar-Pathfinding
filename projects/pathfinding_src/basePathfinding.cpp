@@ -2,7 +2,7 @@
 #include "math.h"
 #include <queue>
 #include <map>
-#include <iostream>
+
 
 // Minimum step cost
 #define HEURISTIC 1.0f
@@ -23,6 +23,7 @@ namespace Pathfinding {
     PathResult AStar::ResolvePath(Node* start, Node* end)
     {
         std::cout << "Starting Pathfinding" << std::endl;
+        StartTiming();
         PathResult path = {};
 
         std::priority_queue<PathFindingEntry> open;
@@ -55,7 +56,7 @@ namespace Pathfinding {
             }
         }
 
-        std::cout << "Finished Pathfinding" << std::endl;
+        path.m_CalcTime = EndTiming(true);
 
         return path;
     }

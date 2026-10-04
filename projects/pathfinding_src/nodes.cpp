@@ -33,5 +33,5 @@ float Pathfinding::DistanceBetweenNodes(Node *a, Node *b)
 
 int Pathfinding::GetIDFromPos(int x, int y)
 {
-    return (y * 8) + x;
+    return (y * 16) + x;
 }

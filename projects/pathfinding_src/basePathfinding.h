@@ -1,11 +1,31 @@
 #include "result.h"
+#include <chrono>
+#include <iostream>
+#include <string>
 
 namespace Pathfinding {
     // Base class to inherit from that contains various pathfinding algorithims
     class PathfindingMethod {
-        private:
+        protected:
             World* m_CurrentWorld;
 
+            std::chrono::high_resolution_clock::time_point m_Timer;
+            inline void StartTiming() {
+                m_Timer = std::chrono::high_resolution_clock::now();
+            }
+            
+            // Time it takes for pathfinding to complete in Miliseconds
+            inline float EndTiming(bool print = false) {
+                auto stop = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - m_Timer);
+                if (print) {
+                    std::cout << "Pathfinding Executed In: " << duration.count() / 1000.0f << "ms" << std::endl;
+                }
+
+                return duration.count() / 1000.0f;
+
+            }
+            
         public:
             // Create a reference to the world for this method
             // Do not inherit from

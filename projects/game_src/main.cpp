@@ -15,26 +15,34 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 
 #include <string>
 
-#define SCREEN_STRIPES 32
+#define MAP_SIZE 16
 
 // Basic map, 1 = Wall, 0 = Nothing
-const int map[8][8] = {
-	{1,1,1,1,1,1,1,1},
-	{1,0,0,0,1,1,0,1},
-	{1,0,1,0,1,0,0,1},
-	{1,0,1,0,1,0,0,1},
-	{1,0,1,0,1,1,0,1},
-	{1,1,1,0,0,0,0,1},
-	{1,1,1,1,1,0,0,1},
-	{1,1,1,1,1,1,1,1},
+const int map[MAP_SIZE][MAP_SIZE] = {
+	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+	{1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1},
+	{1,0,1,1,1,1,1,1,1,0,0,0,1,0,0,1},
+	{1,0,0,0,0,1,0,1,0,0,0,0,1,0,0,1},
+	{1,0,0,0,1,1,0,1,1,1,1,0,1,0,0,1},
+	{1,0,0,0,0,1,0,1,0,0,0,0,1,0,0,1},
+	{1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,1,1,1,1,1,1,1,0,0,0,0,1},
+	{1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1},
+	{1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1},
+	{1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,1},
+	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
-const int MAP_SCALE = 64;
+const int MAP_SCALE = 32;
 const float CIRCLE_RADIUS = 16;
 
 // If any are true then we are out of bounds
 bool IsInBounds(int newPos[2]) {
-	return !(newPos[0] >= 8 || newPos[0] < 0 || newPos[1] >= 8 || newPos[1] < 0);
+	return !(newPos[0] >= MAP_SIZE || newPos[0] < 0 || newPos[1] >= MAP_SIZE || newPos[1] < 0);
 }
 
 int main ()
@@ -58,8 +66,8 @@ int main ()
 
 	// Create a node for every empty square
 	// Due to memory issues we cannot set neighbors here
-	for (int x = 0; x < 8; x++) {
-		for (int y = 0; y < 8; y++) {
+	for (int x = 0; x < MAP_SIZE; x++) {
+		for (int y = 0; y < MAP_SIZE; y++) {
 			if(map[y][x] == 0) {
 				// Set ID to unique value based on index position so we can get it again later
 				curWorld.CreateNode(x,y,Pathfinding::GetIDFromPos(x,y));
@@ -78,8 +86,8 @@ int main ()
 	// NOTE: Idealy this can be cut down, we do far too many loops here
 	// Potentially instead of storing pointers we can store IDs (as we know them from the start)
 	// Then whenever the neighbours need to be accessed we can check if they are valid and pass them through via the int alone?
-	for (int x = 0; x < 8; x++) {
-		for (int y = 0; y < 8; y++) {
+	for (int x = 0; x < MAP_SIZE; x++) {
+		for (int y = 0; y < MAP_SIZE; y++) {
 			if(map[y][x] == 0) {
 				Pathfinding::Node* curNode = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(x, y));
 				int gridPos[2] = {curNode->m_PosX, curNode->m_PosY };
@@ -109,14 +117,39 @@ int main ()
 	// game loop
 	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
 	{
+
+		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+			Vector2 mousePos = GetMousePosition();
+			mousePos /= MAP_SCALE;
+			int gridPos[2] = {mousePos.x, mousePos.y};
+			if (IsInBounds(gridPos) && map[gridPos[1]][gridPos[0]] != 1) {
+				curStart = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(gridPos[0], gridPos[1]));
+
+				result = pathfinder.ResolvePath(curStart, curGoal);
+				path = Pathfinding::ReconstructPath(curStart, curGoal, result);
+			}
+		}
+
+		if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+			Vector2 mousePos = GetMousePosition();
+			mousePos /= MAP_SCALE;
+			int gridPos[2] = {mousePos.x, mousePos.y};
+			if (IsInBounds(gridPos) && map[gridPos[1]][gridPos[0]] != 1) {
+				curGoal = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(gridPos[0], gridPos[1]));
+
+				result = pathfinder.ResolvePath(curStart, curGoal);
+				path = Pathfinding::ReconstructPath(curStart, curGoal, result);
+			}
+		}
+
 		// drawing
 		BeginDrawing();
 		// Setup the back buffer for drawing (clear color and depth buffers)
 		ClearBackground(GRAY);
-
-		
+		float centeringValue = MAP_SCALE * 0.5f;
+		// Drawing nodes + connections
 		for (auto node : curWorld.m_Nodes) {
-			float centeringValue = MAP_SCALE * 0.5f;
+			
 			float screenPos[2] = {node.m_PosX * MAP_SCALE, node.m_PosY * MAP_SCALE};
 			screenPos[0] = screenPos[0] + centeringValue;
 			screenPos[1] = screenPos[1] + centeringValue;
@@ -129,21 +162,23 @@ int main ()
 			Color nodeColor = node.m_Id == curStart->m_Id ? BLUE : RED;
 			nodeColor = node.m_Id == curGoal->m_Id ? GREEN : nodeColor;
 
-			DrawCircle(screenPos[0], screenPos[1], CIRCLE_RADIUS, nodeColor);
-			DrawText((std::to_string( node.m_Id).c_str() ), screenPos[0], screenPos[1], 16, BLACK);
+			DrawCircle(screenPos[0], screenPos[1], MAP_SCALE * 0.25f, nodeColor);
+			DrawText((std::to_string( node.m_Id).c_str() ), screenPos[0], screenPos[1], 8, BLACK);
 		}
 
-		for (int x = 0; x < 8; x++) {
-			for (int y = 0; y < 8; y++) {
+		// Drawing walls
+		for (int x = 0; x < MAP_SIZE; x++) {
+			for (int y = 0; y < MAP_SIZE; y++) {
 				if (map[y][x] == 1) {
 					DrawRectangle(x*MAP_SCALE, y*MAP_SCALE, MAP_SCALE, MAP_SCALE, BLACK);
 				}
 			}
 		}
 
+		// Draw the path result
 		if (!result.results.empty()) {
 		 	for(auto node : path) {
-				DrawCircle(node->m_PosX * MAP_SCALE, node->m_PosY * MAP_SCALE, 8.0f, BLUE);
+				DrawCircle((node->m_PosX * MAP_SCALE) + centeringValue, (node->m_PosY * MAP_SCALE) + centeringValue, 8.0f, BLUE);
 			}
 		}
 

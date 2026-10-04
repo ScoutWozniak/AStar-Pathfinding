@@ -9,6 +9,8 @@ namespace Pathfinding {
     class PathResult {
         public:
         std::map<Node*, Node*> results;
+
+        float m_CalcTime;
     };
 
     inline std::vector<Node*> ReconstructPath(Node* start, Node* end, PathResult result) {
