@@ -109,10 +109,6 @@ int main ()
 	curStart = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(1,1));
 	curGoal = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(6,4));
 
-	Pathfinding::AStar pathfinder = {};
-	Pathfinding::PathResult result = pathfinder.ResolvePath(curStart, curGoal);
-	std::vector<Pathfinding::Node*> path = Pathfinding::ReconstructPath(curStart, curGoal, result);
-
 	Vector2 screenSize = (Vector2{(float)GetScreenWidth(), (float)GetScreenHeight()});
 
 	Camera2D cam;
@@ -125,32 +121,19 @@ int main ()
 	bool drawRawNodes = true;
 
 	NPC npc = {&curWorld, {curStart->m_PosX, curStart->m_PosY}};
+	npc.UpdateGoal(curGoal);
 
 	// game loop
 	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
 	{
 		// GOAL SETTING CONTROLS
-		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), cam);
-			mousePos /= MAP_SCALE;
-			int gridPos[2] = {mousePos.x, mousePos.y};
-			if (IsInBounds(gridPos) && map[gridPos[1]][gridPos[0]] != 1) {
-				curStart = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(gridPos[0], gridPos[1]));
-
-				result = pathfinder.ResolvePath(curStart, curGoal);
-				path = Pathfinding::ReconstructPath(curStart, curGoal, result);
-			}
-		}
-
 		if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
 			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), cam);
 			mousePos /= MAP_SCALE;
 			int gridPos[2] = {mousePos.x, mousePos.y};
 			if (IsInBounds(gridPos) && map[gridPos[1]][gridPos[0]] != 1) {
 				curGoal = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(gridPos[0], gridPos[1]));
-
-				result = pathfinder.ResolvePath(curStart, curGoal);
-				path = Pathfinding::ReconstructPath(curStart, curGoal, result);
+				npc.UpdateGoal(curGoal);
 			}
 		}
 
@@ -210,23 +193,6 @@ int main ()
 				if (map[y][x] == 1) {
 					DrawRectangle(x*MAP_SCALE, y*MAP_SCALE, MAP_SCALE, MAP_SCALE, BLACK);
 				}
-			}
-		}
-
-		// Draw the path result
-		if (!result.results.empty()) {
-			Pathfinding::Node* lastNode;
-		 	for(auto node : path) {
-				float worldX = (node->m_PosX * MAP_SCALE) + centeringValue;
-				float worldY = (node->m_PosY * MAP_SCALE) + centeringValue;
-				DrawCircle(worldX, worldY, MAP_SCALE * 0.15f, BLUE);
-				if (lastNode && node != curStart) {
-					float lastWorldX = (lastNode->m_PosX * MAP_SCALE) + centeringValue;
-					float lastWorldY = (lastNode->m_PosY * MAP_SCALE) + centeringValue;
-
-					DrawLineDashed({worldX, worldY}, {lastWorldX, lastWorldY},8, 4, YELLOW);
-				}
-				lastNode = node;
 			}
 		}
 

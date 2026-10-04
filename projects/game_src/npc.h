@@ -7,7 +7,7 @@ class NPC {
         NPC(Pathfinding::World* _world, Vector2 _pos) {
             m_World = _world;
             m_Position = _pos;
-            m_Goal = Pathfinding::GetNodeInRadius(m_World, m_Position.x, m_Position.y, 1.0f);
+            m_Goal = nullptr;
 
             Initialise();
         }   
@@ -18,6 +18,8 @@ class NPC {
             m_CurrentPath = _result;
         }
 
+        void UpdateGoal(Pathfinding::Node* _goal);
+
         void Initialise();
 
         void Update();
@@ -26,11 +28,15 @@ class NPC {
 
 
     private:
-        Pathfinding::Node m_Goal;
+        const float m_Speed = 3.0f;
+
+        Pathfinding::Node* m_Goal;
 
         Pathfinding::World* m_World;
 
         Pathfinding::PathResult m_CurrentResult;
         std::vector<Pathfinding::Node*> m_CurrentPath;
+
+        void RecalculatePath();
 
 };
