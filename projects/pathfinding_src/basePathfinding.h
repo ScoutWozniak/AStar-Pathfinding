@@ -1,7 +1,6 @@
 #include "result.h"
 
 namespace Pathfinding {
-
     // Base class to inherit from that contains various pathfinding algorithims
     class PathfindingMethod {
         private:
@@ -14,7 +13,9 @@ namespace Pathfinding {
                 m_CurrentWorld = current_world;
             }
 
-            virtual PathResult ResolvePath(Node* start, Node* end);
+            virtual PathResult ResolvePath(Node* start, Node* end) {}
+
+            virtual ~PathfindingMethod() = default;
     };
 
     class Backstepping : public PathfindingMethod {
@@ -37,4 +38,19 @@ namespace Pathfinding {
         PathResult ResolvePath(Node* start, Node* end);
     };
 
+
+    struct PathFindingEntry {
+    public:
+        float priority;
+        Node* node;
+
+        bool operator<(const PathFindingEntry& other) const {
+            return priority < other.priority;
+        }
+
+        PathFindingEntry(Node* _node, float _priority) {
+            node = _node;
+            priority = _priority;
+        }
+    };
 }

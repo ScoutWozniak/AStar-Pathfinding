@@ -9,8 +9,7 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 
 #include "raylib.h"
 #include "raymath.h"
-
-#include "nodes.h"
+#include "basePathfinding.h"
 
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 
@@ -76,6 +75,9 @@ int main ()
 	};
 
 	// Generate the neighbors for each node
+	// NOTE: Idealy this can be cut down, we do far too many loops here
+	// Potentially instead of storing pointers we can store IDs (as we know them from the start)
+	// Then whenever the neighbours need to be accessed we can check if they are valid and pass them through via the int alone?
 	for (int x = 0; x < 8; x++) {
 		for (int y = 0; y < 8; y++) {
 			if(map[y][x] == 0) {
@@ -92,15 +94,17 @@ int main ()
 						}
 					}
 				}
-				
-				
 			}
 		}
 	}
 
+	// Setting up the temporary goal here
 	curStart = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(1,1));
-	curGoal = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(6,6));
+	curGoal = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(6,4));
 
+	Pathfinding::AStar pathfinder = {};
+	Pathfinding::PathResult result = pathfinder.ResolvePath(curStart, curGoal);
+	std::vector<Pathfinding::Node*> path = Pathfinding::ReconstructPath(curStart, curGoal, result);
 
 	// game loop
 	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
@@ -134,6 +138,12 @@ int main ()
 				if (map[y][x] == 1) {
 					DrawRectangle(x*MAP_SCALE, y*MAP_SCALE, MAP_SCALE, MAP_SCALE, BLACK);
 				}
+			}
+		}
+
+		if (!result.results.empty()) {
+		 	for(auto node : path) {
+				DrawCircle(node->m_PosX * MAP_SCALE, node->m_PosY * MAP_SCALE, 8.0f, BLUE);
 			}
 		}
 

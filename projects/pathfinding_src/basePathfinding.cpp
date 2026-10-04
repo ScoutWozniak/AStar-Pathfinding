@@ -1,5 +1,9 @@
 #include "basePathfinding.h"
 #include "math.h"
+#include <queue>
+#include <map>
+#include <iostream>
+
 // Minimum step cost
 #define HEURISTIC 1.0f
 
@@ -14,9 +18,46 @@ namespace Pathfinding {
         return HEURISTIC * (dx + dy);
     }
 
-    PathResult AStar::ResolvePath(Node *start, Node *end)
+
+    // Credit to https://www.redblobgames.com/pathfinding/a-star/implementation.html
+    PathResult AStar::ResolvePath(Node* start, Node* end)
     {
-        return PathResult();
+        std::cout << "Starting Pathfinding" << std::endl;
+        PathResult path = {};
+
+        std::priority_queue<PathFindingEntry> open;
+        
+        std::list<Node*> closed;
+
+        // Cost for each node
+        std::map<Node*, float> costSoFar;
+
+        open.push({start, 0.0f});
+
+        path.results[start] = start;
+        costSoFar[start] = 0;
+
+        while (!open.empty()) {
+            Node* current = open.top().node;
+            open.pop();
+
+            if (current == end)
+                break;
+            
+            for (auto next : current->m_Neighbors) {
+                float new_cost = costSoFar[current] + 1;
+                if (costSoFar.find(next) == costSoFar.end() || new_cost < costSoFar[next]) {
+                    costSoFar[next] = new_cost;
+                    float priority = new_cost + AStarHeuristic(next, end);
+                    open.push({next, priority});
+                    path.results[next] = current;
+                }
+            }
+        }
+
+        std::cout << "Finished Pathfinding" << std::endl;
+
+        return path;
     }
 }
 
