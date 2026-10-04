@@ -55,6 +55,10 @@ int main ()
 	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
 	SearchAndSetResourceDir("resources");	
 
+	Texture2D bgTexture = LoadTexture("pattern_039.png");
+	Texture2D groundTex = LoadTexture("ground_06.png");
+	Texture2D wallTex = LoadTexture("block_01.png");
+
 	Pathfinding::World curWorld = {};
 
 	curWorld.NewWorld();
@@ -125,9 +129,13 @@ int main ()
 	NPC npc2 = {&curWorld, {3, 3}};
 	npc2.UpdateGoal(curGoal2);
 
+	float bgScrollState = 0;
+
 	// game loop
 	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
 	{
+		bgScrollState = Wrap(bgScrollState + GetFrameTime() * 25.0f, 0.0f, (float)bgTexture.width);
+
 		// GOAL SETTING CONTROLS
 		if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
 			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), cam);
@@ -170,8 +178,22 @@ int main ()
 		// drawing
 		BeginDrawing();
 		ClearBackground(GRAY);
+		DrawTextureTiled(bgTexture, {0, 0, (float)bgTexture.width, (float)bgTexture.height}, 
+		{-bgScrollState,-bgScrollState,(float)GetScreenWidth() + bgTexture.width, (float)GetScreenHeight() + bgTexture.height},{0,0},0,1.0f,WHITE);
+
 		BeginMode2D(cam);
 
+
+		// Drawing world
+		for (int x = 0; x < MAP_SIZE; x++) {
+			for (int y = 0; y < MAP_SIZE; y++) {
+				Vector2 renderPos = WorldPosToRenderPos(x,y);
+				DrawTextureEx(groundTex,renderPos,0.0f,0.5f,WHITE);
+				if (map[y][x] == 1) {
+					DrawTextureEx(wallTex,renderPos,0.0f,0.5f,WHITE);
+				}
+			}
+		}
 
 		
 		// Drawing nodes + connections
@@ -197,15 +219,6 @@ int main ()
 			
 		}
 
-		// Drawing walls
-		for (int x = 0; x < MAP_SIZE; x++) {
-			for (int y = 0; y < MAP_SIZE; y++) {
-				if (map[y][x] == 1) {
-					DrawRectangle(x*MAP_SCALE, y*MAP_SCALE, MAP_SCALE, MAP_SCALE, BLACK);
-				}
-			}
-		}
-
 		npc.Draw();
 		npc2.Draw();
 
@@ -215,7 +228,9 @@ int main ()
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
 	}
-
+	UnloadTexture(bgTexture);
+	UnloadTexture(groundTex);
+	UnloadTexture(wallTex);
 
 	// destroy the window and cleanup the OpenGL context
 	CloseWindow();

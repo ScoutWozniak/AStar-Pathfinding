@@ -54,7 +54,6 @@ Pathfinding::Node *Pathfinding::GetNodeInRadius(Pathfinding::World* world, float
     for (auto it = world->m_Nodes.begin(); it != world->m_Nodes.end(); ++it) {
         float nodePos[2] = {(*it).m_PosX, (*it).m_PosY};
         float dist = DistBetweenPoints(posA, nodePos);
-        std::cout << "Dist of point " << (*it).m_Id << " is " << dist << std::endl;
         if (dist <= radius && (dist < closestDist || closestNode == nullptr)) {
             closestNode = &(*it);
             closestDist = dist;
