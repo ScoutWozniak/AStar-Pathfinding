@@ -188,9 +188,13 @@ int main ()
 		for (int x = 0; x < MAP_SIZE; x++) {
 			for (int y = 0; y < MAP_SIZE; y++) {
 				Vector2 renderPos = WorldPosToRenderPos(x,y);
-				DrawTextureEx(groundTex,renderPos,0.0f,0.5f,WHITE);
+				
+				
 				if (map[y][x] == 1) {
-					DrawTextureEx(wallTex,renderPos,0.0f,0.5f,WHITE);
+					DrawRectangle(renderPos.x,renderPos.y,MAP_SCALE, MAP_SCALE, Color{82,58,121,255} );
+				}
+				else {
+					DrawRectangle(renderPos.x,renderPos.y,MAP_SCALE, MAP_SCALE, Color{89, 156, 156,255} );
 				}
 			}
 		}
