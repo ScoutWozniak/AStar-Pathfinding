@@ -6,7 +6,8 @@
                 "${workspaceFolder}/build/external/raylib-master/src/**",
                 "${workspaceFolder}/projects/maze_src/**",
                 "${workspaceFolder}/src/**",
-                "${workspaceFolder}/projects/pathfinding_src"
+                "${workspaceFolder}/projects/pathfinding_src",
+                "${workspaceFolder}/include"
             ],
             "defines": [
                 "_DEBUG",

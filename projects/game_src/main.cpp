@@ -10,12 +10,12 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 #include "raylib.h"
 #include "raymath.h"
 #include "basePathfinding.h"
+#include "global.h"
+#include "npc.h"
 
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 
 #include <string>
-
-#define MAP_SIZE 16
 
 // Basic map, 1 = Wall, 0 = Nothing
 const int map[MAP_SIZE][MAP_SIZE] = {
@@ -37,7 +37,6 @@ const int map[MAP_SIZE][MAP_SIZE] = {
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
-const int MAP_SCALE = 32;
 const float CIRCLE_RADIUS = 16;
 
 // If any are true then we are out of bounds
@@ -75,7 +74,7 @@ int main ()
 		}
 	}
 
-	int nextdoorCheck[4][2] = {
+	const int nextdoorCheck[4][2] = {
 		{0,-1}, // Up
 		{0,1}, // Down
 		{-1,0}, // Left
@@ -122,10 +121,15 @@ int main ()
 	cam.zoom = 1.0f;
 	cam.rotation = 0.0f;
 
+	bool drawConnections = false;
+	bool drawRawNodes = true;
+
+	NPC npc = {&curWorld, {curStart->m_PosX, curStart->m_PosY}};
+
 	// game loop
 	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
 	{
-
+		// GOAL SETTING CONTROLS
 		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), cam);
 			mousePos /= MAP_SCALE;
@@ -150,6 +154,7 @@ int main ()
 			}
 		}
 
+		// CAMERA CONTROLS --------------------------------
 		if (IsKeyDown(KEY_LEFT)) cam.target -= {1.0f, 0.0f};
 		if (IsKeyDown(KEY_RIGHT)) cam.target += {1.0f, 0.0f};
 		if (IsKeyDown(KEY_UP)) cam.target -= {0.0f, 1.0f};
@@ -158,18 +163,21 @@ int main ()
 		if (GetMouseWheelMove() != 0) {
 			float zoomLevel = (GetMouseWheelMove() * 0.25f);
 			cam.zoom = Clamp(cam.zoom + zoomLevel, 0.1f, 2.0f);
-			//cam.target = cam.target -  * 0.5f;
 		}
-		
 
+		// DEBUG DRAW CONTROLS ------------------------------
+		if (IsKeyPressed(KEY_ONE)) drawConnections = !drawConnections;
+		if (IsKeyPressed(KEY_TWO)) drawRawNodes = !drawRawNodes;
+		
+		npc.Update();
 		
 		// drawing
 		BeginDrawing();
-		// Setup the back buffer for drawing (clear color and depth buffers)
 		ClearBackground(GRAY);
-
 		BeginMode2D(cam);
-		float centeringValue = MAP_SCALE * 0.5f;
+
+
+		
 		// Drawing nodes + connections
 		for (auto node : curWorld.m_Nodes) {
 			
@@ -177,19 +185,23 @@ int main ()
 			screenPos[0] = screenPos[0] + centeringValue;
 			screenPos[1] = screenPos[1] + centeringValue;
 
-			// Draw connections between nodes
-			// for (auto connection : node.m_Neighbors) {
-			// 	DrawLine(screenPos[0], screenPos[1],
-			// 		 (connection->m_PosX * MAP_SCALE) + centeringValue, (connection->m_PosY * MAP_SCALE) + centeringValue, YELLOW);
-				
-			// }
+			//Draw connections between nodes
+			if (drawConnections) {
+				for (auto connection : node.m_Neighbors) {
+					DrawLine(screenPos[0], screenPos[1],
+					(connection->m_PosX * MAP_SCALE) + centeringValue, (connection->m_PosY * MAP_SCALE) + centeringValue, YELLOW);
+				}
+			}
+			
 
+			if (drawRawNodes) {
+				Color nodeColor = node.m_Id == curStart->m_Id ? BLUE : RED;
+				nodeColor = node.m_Id == curGoal->m_Id ? GREEN : nodeColor;
 
-			Color nodeColor = node.m_Id == curStart->m_Id ? BLUE : RED;
-			nodeColor = node.m_Id == curGoal->m_Id ? GREEN : nodeColor;
-
-			DrawCircle(screenPos[0], screenPos[1], MAP_SCALE * 0.25f, nodeColor);
-			DrawText((std::to_string( node.m_Id).c_str() ), screenPos[0], screenPos[1], 8, BLACK);
+				DrawCircle(screenPos[0], screenPos[1], MAP_SCALE * 0.25f, nodeColor);
+				DrawText((std::to_string( node.m_Id).c_str() ), screenPos[0], screenPos[1], 8, BLACK);
+			}
+			
 		}
 
 		// Drawing walls
@@ -217,6 +229,9 @@ int main ()
 				lastNode = node;
 			}
 		}
+
+		npc.Draw();
+
 		EndMode2D();
 
 		DrawFPS(0,0);

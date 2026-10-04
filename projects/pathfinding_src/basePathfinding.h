@@ -1,3 +1,4 @@
+#pragma once
 #include "result.h"
 #include <chrono>
 #include <iostream>

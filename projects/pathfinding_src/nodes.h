@@ -1,3 +1,4 @@
+#pragma once
 #include <list>
 
 namespace Pathfinding {
@@ -21,6 +22,9 @@ namespace Pathfinding {
 
     int GetIDFromPos(int x, int y);
 
+    
+    
+
     // Contains all nodes
     class World {
     public:
@@ -35,5 +39,8 @@ namespace Pathfinding {
 
         Node* GetNodeWithId(int id);
     };
+    
+    // NOTE - EXPENSIVE!
+    Node* GetNodeInRadius(World* world, int posX, int posY, float radius);
 }
 

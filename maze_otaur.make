@@ -119,7 +119,9 @@ GENERATED :=
 OBJECTS :=
 
 GENERATED += $(OBJDIR)/main.o
+GENERATED += $(OBJDIR)/npc.o
 OBJECTS += $(OBJDIR)/main.o
+OBJECTS += $(OBJDIR)/npc.o
 
 # Rules
 # #############################################
@@ -184,6 +186,9 @@ endif
 # #############################################
 
 $(OBJDIR)/main.o: projects/game_src/main.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/npc.o: projects/game_src/npc.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
