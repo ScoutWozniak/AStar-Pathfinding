@@ -68,6 +68,10 @@ namespace Pathfinding {
             return priority < other.priority;
         }
 
+        bool operator>(const PathFindingEntry& other) const {
+            return priority > other.priority;
+        }
+
         PathFindingEntry(Node* _node, float _priority) {
             node = _node;
             priority = _priority;

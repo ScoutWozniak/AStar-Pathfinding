@@ -26,7 +26,7 @@ namespace Pathfinding {
         StartTiming();
         PathResult path = {};
 
-        std::priority_queue<PathFindingEntry> open;
+        std::priority_queue<PathFindingEntry, std::vector<PathFindingEntry>, std::greater<PathFindingEntry>> open;
         
         std::list<Node*> closed;
 
@@ -50,7 +50,9 @@ namespace Pathfinding {
                 if (costSoFar.find(next) == costSoFar.end() || new_cost < costSoFar[next]) {
                     costSoFar[next] = new_cost;
                     float priority = new_cost + AStarHeuristic(next, end);
-                    open.push({next, priority});
+                    std::cout << "Heurisitic from " << next->m_Id << " is " << AStarHeuristic(next, end) << std::endl;
+
+                    open.emplace(next, priority);
                     path.results[next] = current;
                 }
             }
