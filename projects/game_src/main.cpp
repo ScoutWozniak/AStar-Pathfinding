@@ -114,12 +114,20 @@ int main ()
 	Pathfinding::PathResult result = pathfinder.ResolvePath(curStart, curGoal);
 	std::vector<Pathfinding::Node*> path = Pathfinding::ReconstructPath(curStart, curGoal, result);
 
+	Vector2 screenSize = (Vector2{(float)GetScreenWidth(), (float)GetScreenHeight()});
+
+	Camera2D cam;
+	cam.target =Vector2One() * MAP_SIZE * MAP_SCALE * 0.5f;
+	cam.offset = screenSize * 0.5f;
+	cam.zoom = 1.0f;
+	cam.rotation = 0.0f;
+
 	// game loop
 	while (!WindowShouldClose())		// run the loop until the user presses ESCAPE or presses the Close button on the window
 	{
 
 		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-			Vector2 mousePos = GetMousePosition();
+			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), cam);
 			mousePos /= MAP_SCALE;
 			int gridPos[2] = {mousePos.x, mousePos.y};
 			if (IsInBounds(gridPos) && map[gridPos[1]][gridPos[0]] != 1) {
@@ -131,7 +139,7 @@ int main ()
 		}
 
 		if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-			Vector2 mousePos = GetMousePosition();
+			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), cam);
 			mousePos /= MAP_SCALE;
 			int gridPos[2] = {mousePos.x, mousePos.y};
 			if (IsInBounds(gridPos) && map[gridPos[1]][gridPos[0]] != 1) {
@@ -142,10 +150,25 @@ int main ()
 			}
 		}
 
+		if (IsKeyDown(KEY_LEFT)) cam.target -= {1.0f, 0.0f};
+		if (IsKeyDown(KEY_RIGHT)) cam.target += {1.0f, 0.0f};
+		if (IsKeyDown(KEY_UP)) cam.target -= {0.0f, 1.0f};
+		if (IsKeyDown(KEY_DOWN)) cam.target += {0.0f, 1.0f};
+
+		if (GetMouseWheelMove() != 0) {
+			float zoomLevel = (GetMouseWheelMove() * 0.25f);
+			cam.zoom = Clamp(cam.zoom + zoomLevel, 0.1f, 2.0f);
+			//cam.target = cam.target -  * 0.5f;
+		}
+		
+
+		
 		// drawing
 		BeginDrawing();
 		// Setup the back buffer for drawing (clear color and depth buffers)
 		ClearBackground(GRAY);
+
+		BeginMode2D(cam);
 		float centeringValue = MAP_SCALE * 0.5f;
 		// Drawing nodes + connections
 		for (auto node : curWorld.m_Nodes) {
@@ -154,11 +177,14 @@ int main ()
 			screenPos[0] = screenPos[0] + centeringValue;
 			screenPos[1] = screenPos[1] + centeringValue;
 
-			for (auto connection : node.m_Neighbors) {
-				DrawLine(screenPos[0], screenPos[1],
-					 (connection->m_PosX * MAP_SCALE) + centeringValue, (connection->m_PosY * MAP_SCALE) + centeringValue, YELLOW);
+			// Draw connections between nodes
+			// for (auto connection : node.m_Neighbors) {
+			// 	DrawLine(screenPos[0], screenPos[1],
+			// 		 (connection->m_PosX * MAP_SCALE) + centeringValue, (connection->m_PosY * MAP_SCALE) + centeringValue, YELLOW);
 				
-			}
+			// }
+
+
 			Color nodeColor = node.m_Id == curStart->m_Id ? BLUE : RED;
 			nodeColor = node.m_Id == curGoal->m_Id ? GREEN : nodeColor;
 
@@ -177,11 +203,23 @@ int main ()
 
 		// Draw the path result
 		if (!result.results.empty()) {
+			Pathfinding::Node* lastNode;
 		 	for(auto node : path) {
-				DrawCircle((node->m_PosX * MAP_SCALE) + centeringValue, (node->m_PosY * MAP_SCALE) + centeringValue, 8.0f, BLUE);
+				float worldX = (node->m_PosX * MAP_SCALE) + centeringValue;
+				float worldY = (node->m_PosY * MAP_SCALE) + centeringValue;
+				DrawCircle(worldX, worldY, MAP_SCALE * 0.15f, BLUE);
+				if (lastNode && node != curStart) {
+					float lastWorldX = (lastNode->m_PosX * MAP_SCALE) + centeringValue;
+					float lastWorldY = (lastNode->m_PosY * MAP_SCALE) + centeringValue;
+
+					DrawLineDashed({worldX, worldY}, {lastWorldX, lastWorldY},8, 4, YELLOW);
+				}
+				lastNode = node;
 			}
 		}
+		EndMode2D();
 
+		DrawFPS(0,0);
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
 	}
