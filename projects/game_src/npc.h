@@ -1,4 +1,6 @@
 #include "raylib.h"
+#include "raymath.h"
+#include "global.h"
 #include "result.h"
 
 // NPC who can follow pathfinding result
@@ -43,3 +45,16 @@ class NPC {
         void RecalculatePath();
 
 };
+
+namespace NPCUtils {
+    inline void TryUpdateNPC(NPC* _npc, const MouseButton _btn, const Vector2 _mousePos, const int (_map)[MAP_SIZE][MAP_SIZE], const Camera2D* _cam, Pathfinding::World* _curWorld) {
+        if (IsMouseButtonPressed(_btn)) {
+            Vector2 mousePos = GetScreenToWorld2D(_mousePos, *_cam);
+            mousePos /= MAP_SCALE;
+            int gridPos[2] = {mousePos.x, mousePos.y};
+            if (IsInBounds(gridPos) && _map[gridPos[1]][gridPos[0]] != 1) {
+                _npc->UpdateGoal(_curWorld->GetNodeWithId(Pathfinding::GetIDFromPos(gridPos[0], gridPos[1])));
+            }
+        }
+    }
+}

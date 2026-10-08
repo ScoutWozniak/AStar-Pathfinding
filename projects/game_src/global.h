@@ -6,6 +6,9 @@
 
 const float centeringValue = MAP_SCALE * 0.5f;
 
+
+
+
 inline Vector2 WorldPosToRenderPos(float x, float y) {
     return {x * MAP_SCALE, y * MAP_SCALE};
 }
@@ -107,3 +110,4 @@ inline void DrawTextureTiled(Texture2D texture, Rectangle source, Rectangle dest
         }
     }
 }
+

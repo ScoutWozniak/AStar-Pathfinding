@@ -8,11 +8,9 @@ namespace MapGen {
 		{1,0}, // Right
 	};
 
-    void CreateWorldFromArray(Pathfinding::World* world, const int (mapGrid)[MAP_SIZE][MAP_SIZE]){
-        SetupNodePos(world,mapGrid);
-        SetupNodeNeighbors(world, mapGrid);
-    }
-
+    
+    // Create a node for every empty square
+	// Due to memory issues we cannot set neighbors here
     void SetupNodePos(Pathfinding::World* world, const int (mapGrid)[MAP_SIZE][MAP_SIZE]) {
         for (int x = 0; x < MAP_SIZE; x++) {
             for (int y = 0; y < MAP_SIZE; y++) {
@@ -23,6 +21,11 @@ namespace MapGen {
             }
         }
     }
+
+    // Generate the neighbors for each node
+	// NOTE: Idealy this can be cut down, we do far too many loops here
+	// Potentially instead of storing pointers we can store IDs (as we know them from the start)
+	// Then whenever the neighbours need to be accessed we can check if they are valid and pass them through via the int alone?
     void SetupNodeNeighbors(Pathfinding::World* world, const int (mapGrid)[MAP_SIZE][MAP_SIZE]) {
         for (int x = 0; x < MAP_SIZE; x++) {
             for (int y = 0; y < MAP_SIZE; y++) {
@@ -43,6 +46,11 @@ namespace MapGen {
                 }
             }
         }
+    }
+
+    void CreateWorldFromArray(Pathfinding::World* world, const int (mapGrid)[MAP_SIZE][MAP_SIZE]){
+        SetupNodePos(world,mapGrid);
+        SetupNodeNeighbors(world, mapGrid);
     }
 }
 

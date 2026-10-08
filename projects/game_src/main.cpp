@@ -41,8 +41,6 @@ const int map[MAP_SIZE][MAP_SIZE] = {
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
-const float CIRCLE_RADIUS = 16;
-
 
 
 // Bloated main function?  Why not!
@@ -58,8 +56,6 @@ int main ()
 	SearchAndSetResourceDir("resources");	
 
 	Texture2D bgTexture = LoadTexture("pattern_039.png");
-	Texture2D groundTex = LoadTexture("ground_06.png");
-	Texture2D wallTex = LoadTexture("block_01.png");
 
 	Pathfinding::World curWorld = {};
 
@@ -94,31 +90,11 @@ int main ()
 		bgScrollState = Wrap(bgScrollState + GetFrameTime() * 25.0f, 0.0f, (float)bgTexture.width);
 
 		// GOAL SETTING CONTROLS
-		if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), camController.m_Cam);
-			mousePos /= MAP_SCALE;
-			int gridPos[2] = {mousePos.x, mousePos.y};
-			if (IsInBounds(gridPos) && map[gridPos[1]][gridPos[0]] != 1) {
-				curGoal = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(gridPos[0], gridPos[1]));
-				npc.UpdateGoal(curGoal);
-			}
-		}
-		
-		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), camController.m_Cam);
-			mousePos /= MAP_SCALE;
-			int gridPos[2] = {mousePos.x, mousePos.y};
-			if (IsInBounds(gridPos) && map[gridPos[1]][gridPos[0]] != 1) {
-				curGoal2 = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(gridPos[0], gridPos[1]));
-				npc2.UpdateGoal(curGoal2);
-			}
-		}
-
+		NPCUtils::TryUpdateNPC(&npc, MOUSE_BUTTON_RIGHT, GetMousePosition(), map, &camController.m_Cam, &curWorld);
+		NPCUtils::TryUpdateNPC(&npc2, MOUSE_BUTTON_LEFT, GetMousePosition(), map, &camController.m_Cam, &curWorld);
 		
 
 		camController.Update();
-
-		
 
 		// DEBUG DRAW CONTROLS ------------------------------
 		if (IsKeyPressed(KEY_ONE)) Rendering::ToggleDrawNodes();
@@ -152,8 +128,6 @@ int main ()
 		EndDrawing();
 	}
 	UnloadTexture(bgTexture);
-	UnloadTexture(groundTex);
-	UnloadTexture(wallTex);
 
 	// destroy the window and cleanup the OpenGL context
 	CloseWindow();
