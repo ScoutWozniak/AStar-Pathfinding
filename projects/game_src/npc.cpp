@@ -20,7 +20,9 @@ void NPC::Initialise()
 void NPC::Update()
 {
     m_CurrentAngle = Lerp(m_CurrentAngle, m_TargetAngle, GetFrameTime() * 20.0f);
-    if (m_CurrentPath.empty()) return;
+    if (m_CurrentPath.empty()) {
+        return;
+    } 
 
     Vector2 nodePos =  {m_CurrentPath.front()->m_PosX, m_CurrentPath.front()->m_PosY};
     Vector2 dirToFirstPoint = Vector2Normalize(nodePos - m_Position) * m_Speed * GetFrameTime();
@@ -67,7 +69,9 @@ void NPC::Draw()
 void NPC::RecalculatePath()
 {
     Pathfinding::Node* closestNode = Pathfinding::GetNodeInRadius(m_World, m_Position.x, m_Position.y, 0.5f);
-    if (closestNode == nullptr) return;
+    if (closestNode == nullptr) {
+        return;
+    } 
     
     Pathfinding::AStar pathfinder = {};
     m_CurrentResult = pathfinder.ResolvePath(closestNode, m_Goal);

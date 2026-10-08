@@ -9,21 +9,21 @@ const float centeringValue = MAP_SCALE * 0.5f;
 
 
 
-inline Vector2 WorldPosToRenderPos(float x, float y) {
-    return {x * MAP_SCALE, y * MAP_SCALE};
+inline Vector2 WorldPosToRenderPos(const float _x, const float y) {
+    return {_x * MAP_SCALE, y * MAP_SCALE};
 }
 
-inline Vector2 WorldPosToRenderPos(float pos[]) {
-    return WorldPosToRenderPos(pos[0], pos[1]);
+inline Vector2 WorldPosToRenderPos(const float _pos[]) {
+    return WorldPosToRenderPos(_pos[0], _pos[1]);
 }
 
-inline Vector2 WorldPosToRenderPos(Vector2 pos) {
-    return WorldPosToRenderPos(pos.x, pos.y);
+inline Vector2 WorldPosToRenderPos(const Vector2 _pos) {
+    return WorldPosToRenderPos(_pos.x, _pos.y);
 }
 
 // If any are true then we are out of bounds
-inline bool IsInBounds(int newPos[2]) {
-	return !(newPos[0] >= MAP_SIZE || newPos[0] < 0 || newPos[1] >= MAP_SIZE || newPos[1] < 0);
+inline bool IsInBounds(const int _newPos[2]) {
+	return !(_newPos[0] >= MAP_SIZE || _newPos[0] < 0 || _newPos[1] >= MAP_SIZE || _newPos[1] < 0);
 }
 
 // NOTE - TAKEN FROM https://www.raylib.com/examples.html

@@ -11,12 +11,12 @@ namespace MapGen {
     
     // Create a node for every empty square
 	// Due to memory issues we cannot set neighbors here
-    void SetupNodePos(Pathfinding::World* world, const int (mapGrid)[MAP_SIZE][MAP_SIZE]) {
+    void SetupNodePos(Pathfinding::World* _world, const int (_mapGrid)[MAP_SIZE][MAP_SIZE]) {
         for (int x = 0; x < MAP_SIZE; x++) {
             for (int y = 0; y < MAP_SIZE; y++) {
-                if(mapGrid[y][x] == 0) {
+                if(_mapGrid[y][x] == 0) {
                     // Set ID to unique value based on index position so we can get it again later
-                    world->CreateNode(x,y,Pathfinding::GetIDFromPos(x,y));
+                    _world->CreateNode(x,y,Pathfinding::GetIDFromPos(x,y));
                 }
             }
         }
@@ -26,18 +26,18 @@ namespace MapGen {
 	// NOTE: Idealy this can be cut down, we do far too many loops here
 	// Potentially instead of storing pointers we can store IDs (as we know them from the start)
 	// Then whenever the neighbours need to be accessed we can check if they are valid and pass them through via the int alone?
-    void SetupNodeNeighbors(Pathfinding::World* world, const int (mapGrid)[MAP_SIZE][MAP_SIZE]) {
+    void SetupNodeNeighbors(Pathfinding::World* _world, const int (_mapGrid)[MAP_SIZE][MAP_SIZE]) {
         for (int x = 0; x < MAP_SIZE; x++) {
             for (int y = 0; y < MAP_SIZE; y++) {
-                if(mapGrid[y][x] == 0) {
-                    Pathfinding::Node* curNode = world->GetNodeWithId(Pathfinding::GetIDFromPos(x, y));
+                if(_mapGrid[y][x] == 0) {
+                    Pathfinding::Node* curNode = _world->GetNodeWithId(Pathfinding::GetIDFromPos(x, y));
                     int gridPos[2] = {curNode->m_PosX, curNode->m_PosY };
                     // Loop through all neighbors here
                     for (int i = 0; i < 4; i++) {
                         int newPos[2] = {gridPos[0] + nextdoorCheck[i][0], gridPos[1] + nextdoorCheck[i][1]};
-                        if (IsInBounds(newPos) && (mapGrid[newPos[1]][newPos[0]]) != 1) {
+                        if (IsInBounds(newPos) && (_mapGrid[newPos[1]][newPos[0]]) != 1) {
                             int nodeId = Pathfinding::GetIDFromPos(newPos[0], newPos[1]);
-                            Pathfinding::Node* connectingNode = world->GetNodeWithId(nodeId);
+                            Pathfinding::Node* connectingNode = _world->GetNodeWithId(nodeId);
                             if (connectingNode) {
                                 curNode->m_Neighbors.emplace_back(connectingNode);
                             }
@@ -48,9 +48,9 @@ namespace MapGen {
         }
     }
 
-    void CreateWorldFromArray(Pathfinding::World* world, const int (mapGrid)[MAP_SIZE][MAP_SIZE]){
-        SetupNodePos(world,mapGrid);
-        SetupNodeNeighbors(world, mapGrid);
+    void CreateWorldFromArray(Pathfinding::World* _world, const int (_mapGrid)[MAP_SIZE][MAP_SIZE]){
+        SetupNodePos(_world,_mapGrid);
+        SetupNodeNeighbors(_world, _mapGrid);
     }
 }
 

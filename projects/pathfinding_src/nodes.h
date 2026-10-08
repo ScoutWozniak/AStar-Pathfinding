@@ -11,16 +11,16 @@ namespace Pathfinding {
 
         std::list<Node*> m_Neighbors;
 
-        Node(float posX, float posY, int id) {
-            m_PosX = posX;
-            m_PosY = posY;
-            m_Id = id;
+        Node(float _posX, float _posY, int _id) {
+            m_PosX = _posX;
+            m_PosY = _posY;
+            m_Id = _id;
         }
     };
 
-    float DistanceBetweenNodes(Node* a, Node* b);
+    float DistanceBetweenNodes(Node* _a, Node* _b);
 
-    int GetIDFromPos(int x, int y);
+    int GetIDFromPos(int _x, int _y);
 
     
     
@@ -35,12 +35,12 @@ namespace Pathfinding {
 
         // Add a node with an optional ID to the array
         // IDs exist so we can reference based on grid index
-        void CreateNode(float posX, float posY, int id = -1);
+        void CreateNode(float _posX, float _posY, int _id = -1);
 
-        Node* GetNodeWithId(int id);
+        Node* GetNodeWithId(int _id);
     };
 
     // NOTE - EXPENSIVE!
-    Node* GetNodeInRadius(World* world, float posX, float posY, float radius);
+    Node* GetNodeInRadius(World* _world, float _posX, float _posY, float _radius);
 }
 

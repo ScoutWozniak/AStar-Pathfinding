@@ -16,10 +16,10 @@ namespace Pathfinding {
             }
             
             // Time it takes for pathfinding to complete in Miliseconds
-            inline float EndTiming(bool print = false) {
+            inline float EndTiming(bool _print = false) {
                 auto stop = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - m_Timer);
-                if (print) {
+                if (_print) {
                     std::cout << "Pathfinding Executed In: " << duration.count() / 1000.0f << "ms" << std::endl;
                 }
 
@@ -30,21 +30,22 @@ namespace Pathfinding {
         public:
             // Create a reference to the world for this method
             // Do not inherit from
-            void SetWorld(World* current_world) {
-                m_CurrentWorld = current_world;
+            void SetWorld(World* _current_world) {
+                m_CurrentWorld = _current_world;
             }
 
-            virtual PathResult ResolvePath(Node* start, Node* end) {}
+            virtual PathResult ResolvePath(Node* _start, Node* _end) {return {};};
 
             virtual ~PathfindingMethod() = default;
     };
     
     class AStar : public PathfindingMethod {
         public:
-        PathResult ResolvePath(Node* start, Node* end);
+        PathResult ResolvePath(Node* _start, Node* _end);
     };
 
 
+    // Helper struct for handling priority in priorityqueue
     struct PathFindingEntry {
     public:
         float priority;

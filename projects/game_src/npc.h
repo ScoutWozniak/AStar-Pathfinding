@@ -51,7 +51,7 @@ namespace NPCUtils {
         if (IsMouseButtonPressed(_btn)) {
             Vector2 mousePos = GetScreenToWorld2D(_mousePos, *_cam);
             mousePos /= MAP_SCALE;
-            int gridPos[2] = {mousePos.x, mousePos.y};
+            int gridPos[2] = {(int)mousePos.x, (int)mousePos.y};
             if (IsInBounds(gridPos) && _map[gridPos[1]][gridPos[0]] != 1) {
                 _npc->UpdateGoal(_curWorld->GetNodeWithId(Pathfinding::GetIDFromPos(gridPos[0], gridPos[1])));
             }
