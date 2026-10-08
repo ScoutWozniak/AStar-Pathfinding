@@ -1,4 +1,5 @@
 #pragma once
+#include "raylib.h"
 
 #define MAP_SIZE 16
 #define MAP_SCALE 32
@@ -15,6 +16,11 @@ inline Vector2 WorldPosToRenderPos(float pos[]) {
 
 inline Vector2 WorldPosToRenderPos(Vector2 pos) {
     return WorldPosToRenderPos(pos.x, pos.y);
+}
+
+// If any are true then we are out of bounds
+inline bool IsInBounds(int newPos[2]) {
+	return !(newPos[0] >= MAP_SIZE || newPos[0] < 0 || newPos[1] >= MAP_SIZE || newPos[1] < 0);
 }
 
 // NOTE - TAKEN FROM https://www.raylib.com/examples.html

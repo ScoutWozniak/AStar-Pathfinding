@@ -12,6 +12,10 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 #include "basePathfinding.h"
 #include "global.h"
 #include "npc.h"
+#include "systems/map_gen.h"
+#include "systems/camController.h"
+#include "systems/rendering.h"
+
 
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 
@@ -39,10 +43,6 @@ const int map[MAP_SIZE][MAP_SIZE] = {
 
 const float CIRCLE_RADIUS = 16;
 
-// If any are true then we are out of bounds
-bool IsInBounds(int newPos[2]) {
-	return !(newPos[0] >= MAP_SIZE || newPos[0] < 0 || newPos[1] >= MAP_SIZE || newPos[1] < 0);
-}
 
 
 // Bloated main function?  Why not!
@@ -63,69 +63,24 @@ int main ()
 
 	Pathfinding::World curWorld = {};
 
+
 	curWorld.NewWorld();
 
-	// Create a node for every empty square
-	// Due to memory issues we cannot set neighbors here
-	for (int x = 0; x < MAP_SIZE; x++) {
-		for (int y = 0; y < MAP_SIZE; y++) {
-			if(map[y][x] == 0) {
-				// Set ID to unique value based on index position so we can get it again later
-				curWorld.CreateNode(x,y,Pathfinding::GetIDFromPos(x,y));
-			}
-		}
-	}
 
-	const int nextdoorCheck[4][2] = {
-		{0,-1}, // Up
-		{0,1}, // Down
-		{-1,0}, // Left
-		{1,0}, // Right
-	};
-
-	// Generate the neighbors for each node
-	// NOTE: Idealy this can be cut down, we do far too many loops here
-	// Potentially instead of storing pointers we can store IDs (as we know them from the start)
-	// Then whenever the neighbours need to be accessed we can check if they are valid and pass them through via the int alone?
-	for (int x = 0; x < MAP_SIZE; x++) {
-		for (int y = 0; y < MAP_SIZE; y++) {
-			if(map[y][x] == 0) {
-				Pathfinding::Node* curNode = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(x, y));
-				int gridPos[2] = {curNode->m_PosX, curNode->m_PosY };
-				// Loop through all neighbors here
-				for (int i = 0; i < 4; i++) {
-					int newPos[2] = {gridPos[0] + nextdoorCheck[i][0], gridPos[1] + nextdoorCheck[i][1]};
-					if (IsInBounds(newPos) && map[newPos[1]][newPos[0]] != 1) {
-						int nodeId = Pathfinding::GetIDFromPos(newPos[0], newPos[1]);
-						Pathfinding::Node* connectingNode = curWorld.GetNodeWithId(nodeId);
-						if (connectingNode) {
-							curNode->m_Neighbors.emplace_back(connectingNode);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// Setting up the temporary goal here
+	MapGen::CreateWorldFromArray(&curWorld, map);
+	
+	// Setting up the temporary goals here
 	Pathfinding::Node* curGoal = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(1,1));
-	Pathfinding::Node* curStart = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(6,4));
-
-
 	Pathfinding::Node* curGoal2 = curWorld.GetNodeWithId(Pathfinding::GetIDFromPos(15, 1));
+	
 
-	Vector2 screenSize = (Vector2{(float)GetScreenWidth(), (float)GetScreenHeight()});
+	CameraController camController = {};
 
-	Camera2D cam;
-	cam.target =Vector2One() * MAP_SIZE * MAP_SCALE * 0.5f;
-	cam.offset = screenSize * 0.5f;
-	cam.zoom = 1.0f;
-	cam.rotation = 0.0f;
 
 	bool drawConnections = false;
 	bool drawRawNodes = true;
 
-	NPC npc = {&curWorld, {curStart->m_PosX, curStart->m_PosY}};
+	NPC npc = {&curWorld, {2,2}};
 	npc.UpdateGoal(curGoal);
 
 	NPC npc2 = {&curWorld, {3, 3}};
@@ -140,7 +95,7 @@ int main ()
 
 		// GOAL SETTING CONTROLS
 		if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), cam);
+			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), camController.m_Cam);
 			mousePos /= MAP_SCALE;
 			int gridPos[2] = {mousePos.x, mousePos.y};
 			if (IsInBounds(gridPos) && map[gridPos[1]][gridPos[0]] != 1) {
@@ -148,9 +103,9 @@ int main ()
 				npc.UpdateGoal(curGoal);
 			}
 		}
-
+		
 		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), cam);
+			Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), camController.m_Cam);
 			mousePos /= MAP_SCALE;
 			int gridPos[2] = {mousePos.x, mousePos.y};
 			if (IsInBounds(gridPos) && map[gridPos[1]][gridPos[0]] != 1) {
@@ -159,20 +114,15 @@ int main ()
 			}
 		}
 
-		// CAMERA CONTROLS --------------------------------
-		if (IsKeyDown(KEY_LEFT)) cam.target -= {1.0f, 0.0f};
-		if (IsKeyDown(KEY_RIGHT)) cam.target += {1.0f, 0.0f};
-		if (IsKeyDown(KEY_UP)) cam.target -= {0.0f, 1.0f};
-		if (IsKeyDown(KEY_DOWN)) cam.target += {0.0f, 1.0f};
+		
 
-		if (GetMouseWheelMove() != 0) {
-			float zoomLevel = (GetMouseWheelMove() * 0.25f);
-			cam.zoom = Clamp(cam.zoom + zoomLevel, 0.1f, 2.0f);
-		}
+		camController.Update();
+
+		
 
 		// DEBUG DRAW CONTROLS ------------------------------
-		if (IsKeyPressed(KEY_ONE)) drawConnections = !drawConnections;
-		if (IsKeyPressed(KEY_TWO)) drawRawNodes = !drawRawNodes;
+		if (IsKeyPressed(KEY_ONE)) Rendering::ToggleDrawNodes();
+		if (IsKeyPressed(KEY_TWO)) Rendering::ToggleDrawConnections();
 		
 		npc.Update();
 		npc2.Update();
@@ -180,50 +130,17 @@ int main ()
 		// drawing
 		BeginDrawing();
 		ClearBackground(GRAY);
+
 		DrawTextureTiled(bgTexture, {0, 0, (float)bgTexture.width, (float)bgTexture.height}, 
 		{-bgScrollState,-bgScrollState,(float)GetScreenWidth() + bgTexture.width, (float)GetScreenHeight() + bgTexture.height},{0,0},0,1.0f,WHITE);
 
-		BeginMode2D(cam);
+		BeginMode2D(camController.m_Cam);
 
 
 		// Drawing world
-		for (int x = 0; x < MAP_SIZE; x++) {
-			for (int y = 0; y < MAP_SIZE; y++) {
-				Vector2 renderPos = WorldPosToRenderPos(x,y);
-				
-				
-				if (map[y][x] == 1) {
-					DrawRectangle(renderPos.x,renderPos.y,MAP_SCALE, MAP_SCALE, Color{82,58,121,255} );
-				}
-				else {
-					DrawRectangle(renderPos.x,renderPos.y,MAP_SCALE, MAP_SCALE, Color{89, 156, 156,255} );
-				}
-			}
-		}
-
 		
-		// Drawing nodes + connections
-		for (auto node : curWorld.m_Nodes) {
-			
-			float screenPos[2] = {node.m_PosX * MAP_SCALE, node.m_PosY * MAP_SCALE};
-			screenPos[0] = screenPos[0] + centeringValue;
-			screenPos[1] = screenPos[1] + centeringValue;
 
-			//Draw connections between nodes
-			if (drawConnections) {
-				for (auto connection : node.m_Neighbors) {
-					DrawLine(screenPos[0], screenPos[1],
-					(connection->m_PosX * MAP_SCALE) + centeringValue, (connection->m_PosY * MAP_SCALE) + centeringValue, YELLOW);
-				}
-			}
-			
-
-			if (drawRawNodes) {
-				DrawCircle(screenPos[0], screenPos[1], MAP_SCALE * 0.25f, RED);
-				DrawText((std::to_string( node.m_Id).c_str() ), screenPos[0], screenPos[1], 8, BLACK);
-			}
-			
-		}
+		Rendering::DrawWorld(&curWorld, map);
 
 		npc.Draw();
 		npc2.Draw();

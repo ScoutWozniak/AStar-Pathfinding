@@ -118,10 +118,16 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/camController.o
 GENERATED += $(OBJDIR)/main.o
+GENERATED += $(OBJDIR)/map_gen.o
 GENERATED += $(OBJDIR)/npc.o
+GENERATED += $(OBJDIR)/rendering.o
+OBJECTS += $(OBJDIR)/camController.o
 OBJECTS += $(OBJDIR)/main.o
+OBJECTS += $(OBJDIR)/map_gen.o
 OBJECTS += $(OBJDIR)/npc.o
+OBJECTS += $(OBJDIR)/rendering.o
 
 # Rules
 # #############################################
@@ -189,6 +195,15 @@ $(OBJDIR)/main.o: projects/game_src/main.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/npc.o: projects/game_src/npc.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/camController.o: projects/game_src/systems/camController.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/map_gen.o: projects/game_src/systems/map_gen.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/rendering.o: projects/game_src/systems/rendering.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
