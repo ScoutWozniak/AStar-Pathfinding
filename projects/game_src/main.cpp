@@ -44,6 +44,8 @@ bool IsInBounds(int newPos[2]) {
 	return !(newPos[0] >= MAP_SIZE || newPos[0] < 0 || newPos[1] >= MAP_SIZE || newPos[1] < 0);
 }
 
+
+// Bloated main function?  Why not!
 int main ()
 {
 	// Tell the window to use vsync and work on high DPI displays

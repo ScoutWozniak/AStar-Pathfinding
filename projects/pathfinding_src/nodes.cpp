@@ -9,12 +9,12 @@ void Pathfinding::World::NewWorld()
     m_Nodes.clear();
 }
 
-void Pathfinding::World::CreateNode(float posX, float posY, int id)
+void Pathfinding::World::CreateNode(const float posX, const float posY, const int id)
 {
     m_Nodes.emplace_back(Pathfinding::Node{posX, posY, id});
 }
 
-Pathfinding::Node* Pathfinding::World::GetNodeWithId(int id)
+Pathfinding::Node* Pathfinding::World::GetNodeWithId(const int id)
 {
     std::list<Pathfinding::Node>::iterator it = std::find_if(m_Nodes.begin(), m_Nodes.end(), [&id](const Pathfinding::Node& x) {return x.m_Id == id;});
     return &(*it);
@@ -38,14 +38,14 @@ float Pathfinding::DistanceBetweenNodes(Node *a, Node *b)
     return DistBetweenPoints(aPos, bPos);
 }
 
-int Pathfinding::GetIDFromPos(int x, int y)
+int Pathfinding::GetIDFromPos(const int x,const int y)
 {
     return (y * 16) + x;
 }
 
 
 
-Pathfinding::Node *Pathfinding::GetNodeInRadius(Pathfinding::World* world, float posX, float posY, float radius)
+Pathfinding::Node *Pathfinding::GetNodeInRadius(Pathfinding::World* world, const float posX, const float posY, const float radius)
 {
     float posA[2] = {posX, posY};
     Pathfinding::Node* closestNode = nullptr;
