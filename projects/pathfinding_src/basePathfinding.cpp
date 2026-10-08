@@ -52,8 +52,6 @@ namespace Pathfinding {
                     costSoFar[next] = new_cost;
                     float priority = new_cost + AStarHeuristic(next, end);
 
-                    //std::cout << "Heurisitic from " << next->m_Id << " is " << AStarHeuristic(next, end) << std::endl; -- DEBUG TEXT
-
                     // Emplace the node into the queue as long as it has a decent priority calculation
                     // This means if a node gets recalculated to have a lower priority it will be checked at again
                     open.emplace(next, priority);

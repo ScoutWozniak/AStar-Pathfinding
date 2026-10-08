@@ -38,22 +38,7 @@ namespace Pathfinding {
 
             virtual ~PathfindingMethod() = default;
     };
-
-    class Backstepping : public PathfindingMethod {
-        public:
-        PathResult ResolvePath(Node* start, Node* end);
-    };
-
-    class BreadthFirst : public PathfindingMethod {
-        public:
-        PathResult ResolvePath(Node* start, Node* end);
-    };
-
-    class DepthFirst : public PathfindingMethod {
-        public:
-        PathResult ResolvePath(Node* start, Node* end);
-    };
-
+    
     class AStar : public PathfindingMethod {
         public:
         PathResult ResolvePath(Node* start, Node* end);
